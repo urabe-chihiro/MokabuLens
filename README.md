@@ -4,39 +4,113 @@ See the market through your own lens.
 
 Built with **Next.js**, **Python**, and **Prisma**, MokabuLens is a friendly dashboard for investors to record insights, monitor stock indicators, and grow smarter — the Mokabu way.
 
+## 🏗️ Monorepo Structure
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This project uses a monorepo structure with pnpm workspaces:
 
-## Getting Started
+```
+MokabuLens/
+├── apps/
+│   └── web/                    # Next.js web application
+│       ├── app/               # App Router pages and components
+│       ├── components/        # Reusable UI components (shadcn/ui)
+│       └── ...
+├── packages/                   # Shared packages (future)
+├── package.json               # Root workspace configuration
+└── pnpm-workspace.yaml       # pnpm workspace configuration
+```
 
-First, run the development server:
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- pnpm (recommended package manager)
+
+### Installation
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Install dependencies
+pnpm install
+```
+
+### Development
+
+```bash
+# Start the development server
 pnpm dev
-# or
-bun dev
+
+# Or start a specific app
+pnpm --filter web dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Other Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Build for production
+pnpm build
 
-## Learn More
+# Run linting
+pnpm lint
 
-To learn more about Next.js, take a look at the following resources:
+# Start production server
+pnpm start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Framework**: Next.js 16 (with Turbopack)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui + Radix UI
+- **Package Manager**: pnpm
+- **Monorepo**: pnpm workspaces
 
-## Deploy on Vercel
+## 📁 Project Structure
+
+- **`apps/web/`** - Main Next.js web application
+  - UI components are managed within the web app
+  - Uses App Router for routing
+  - Configured with shadcn/ui components
+
+- **`packages/`** - Shared packages (ready for future expansion)
+  - Can be used for shared utilities, types, or components
+  - Currently empty, ready for additional apps/services
+
+## 🔧 Development
+
+### Adding New Apps
+
+To add a new application to the monorepo:
+
+```bash
+# Create new app directory
+mkdir apps/new-app
+
+# Add package.json with appropriate name
+# Update pnpm-workspace.yaml if needed
+```
+
+### Adding Shared Packages
+
+To add a shared package:
+
+```bash
+# Create new package directory
+mkdir packages/shared-utils
+
+# Add package.json with appropriate configuration
+```
+
+## 📚 Learn More
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
+- [pnpm Workspaces](https://pnpm.io/workspaces) - learn about pnpm workspace management
+- [shadcn/ui](https://ui.shadcn.com/) - learn about the UI component library
+
+## 🚀 Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 

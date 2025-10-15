@@ -7,6 +7,15 @@ settings:
 importers:
 
   .:
+    devDependencies:
+      '@types/node':
+        specifier: ^20
+        version: 20.19.21
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  apps/web:
     dependencies:
       '@radix-ui/react-slot':
         specifier: ^1.2.3
