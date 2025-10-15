@@ -121,9 +121,9 @@ Since this is a monorepo, you need to configure Vercel properly:
 1. **Import your project** to Vercel
 2. **Set the Root Directory** to `apps/web` in your project settings
 3. **Build Command**: `pnpm build` (runs from root, uses workspace filter)
-4. **Output Directory**: `apps/web/.next`
+4. **Output Directory**: `.next`
 
-The project includes a `vercel.json` configuration file that handles these settings automatically.
+The project includes a `vercel.json` configuration file that handles build settings automatically.
 
 ### Manual Configuration (if needed)
 
