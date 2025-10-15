@@ -121,7 +121,7 @@ Since this is a monorepo, you need to configure Vercel properly:
 1. **Import your project** to Vercel
 2. **Set the Root Directory** to `apps/web` in your project settings
 3. **Build Command**: `pnpm build` (runs from root, uses workspace filter)
-4. **Output Directory**: `.next`
+4. **Output Directory**: `.next` (automatically detected by Next.js)
 
 The project includes a `vercel.json` configuration file that handles build settings automatically.
 
@@ -132,7 +132,7 @@ If you need to configure manually in Vercel dashboard:
 - **Root Directory**: `apps/web`
 - **Framework Preset**: Next.js
 - **Build Command**: `pnpm build`
-- **Output Directory**: `.next`
+- **Output Directory**: `.next` (leave empty for auto-detection)
 - **Install Command**: `pnpm install`
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
