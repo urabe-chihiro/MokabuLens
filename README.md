@@ -114,4 +114,25 @@ mkdir packages/shared-utils
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
+### Monorepo Deployment Setup
+
+Since this is a monorepo, you need to configure Vercel properly:
+
+1. **Import your project** to Vercel
+2. **Set the Root Directory** to `apps/web` in your project settings
+3. **Build Command**: `pnpm build` (runs from root, uses workspace filter)
+4. **Output Directory**: `apps/web/.next`
+
+The project includes a `vercel.json` configuration file that handles these settings automatically.
+
+### Manual Configuration (if needed)
+
+If you need to configure manually in Vercel dashboard:
+
+- **Root Directory**: `apps/web`
+- **Framework Preset**: Next.js
+- **Build Command**: `pnpm build`
+- **Output Directory**: `.next`
+- **Install Command**: `pnpm install`
+
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
