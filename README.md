@@ -140,9 +140,19 @@ If you need to configure manually in Vercel dashboard:
 
 If you encounter path duplication errors (like `/vercel/path0/apps/web/apps/web/.next/`):
 
+**Method 1: Fix existing project**
+1. Go to your Vercel project settings
+2. Set **Root Directory** to `apps/web`
+3. Set **Output Directory** to `.next`
+4. Redeploy the project
+
+**Method 2: Create new project (recommended)**
 1. **Delete the existing Vercel project**
 2. **Create a new project** from the same repository
-3. **Set Root Directory to `apps/web`** during project creation
+3. **During project creation, set Root Directory to `apps/web`**
 4. **Use the build command**: `pnpm --filter web build`
+5. **Set Output Directory**: `.next`
+
+**Important**: The Root Directory must be set to `apps/web` for the monorepo to work correctly.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
