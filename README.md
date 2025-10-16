@@ -2,7 +2,7 @@
 
 See the market through your own lens.
 
-Built with **Next.js**, **Python**, and **Prisma**, MokabuLens is a friendly dashboard for investors to record insights, monitor stock indicators, and grow smarter — the Mokabu way.
+Built with **Next.js**, **FastAPI**, **PostgreSQL**, and **SQLAlchemy**, MokabuLens is a friendly dashboard for investors to record insights, monitor stock indicators, and grow smarter — the Mokabu way.
 
 ## 🏗️ Monorepo Structure
 
@@ -11,11 +11,18 @@ This project uses a monorepo structure with pnpm workspaces:
 ```
 MokabuLens/
 ├── apps/
-│   └── web/                    # Next.js web application
-│       ├── app/               # App Router pages and components
-│       ├── components/        # Reusable UI components (shadcn/ui)
-│       └── ...
-├── packages/                   # Shared packages (future)
+│   ├── web/                    # Next.js web application
+│   │   ├── app/               # App Router pages and components
+│   │   ├── components/        # Reusable UI components (shadcn/ui)
+│   │   └── Dockerfile         # Docker configuration for web app
+│   └── api/                   # FastAPI backend application
+│       ├── main.py            # FastAPI main application
+│       ├── database.py        # SQLAlchemy database configuration
+│       ├── models.py          # Database models
+│       ├── requirements.txt   # Python dependencies
+│       ├── Dockerfile         # Docker configuration for API
+│       └── init.sql           # PostgreSQL initialization script
+├── docker-compose.yml         # Docker Compose configuration
 ├── package.json               # Root workspace configuration
 └── pnpm-workspace.yaml       # pnpm workspace configuration
 ```
@@ -24,27 +31,48 @@ MokabuLens/
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Docker and Docker Compose
+- Node.js 18+ (for local development)
 - pnpm (recommended package manager)
 
-### Installation
+### 🐳 Docker Development (Recommended)
+
+The easiest way to get started is using Docker:
+
+```bash
+# Start all services (PostgreSQL, FastAPI, Next.js)
+docker-compose up
+
+# Or run in background
+docker-compose up -d
+```
+
+This will start:
+- **PostgreSQL** on `localhost:5432`
+- **FastAPI API** on `http://localhost:8000`
+- **Next.js Web App** on `http://localhost:3000`
+
+### 📱 Access the Applications
+
+- **Frontend (Next.js)**: [http://localhost:3000](http://localhost:3000)
+- **Backend API (FastAPI)**: [http://localhost:8000](http://localhost:8000)
+- **API Documentation**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Database**: PostgreSQL on `localhost:5432`
+
+### 🛠️ Local Development (Without Docker)
+
+If you prefer to run locally without Docker:
 
 ```bash
 # Install dependencies
 pnpm install
-```
 
-### Development
-
-```bash
 # Start the development server
 pnpm dev
 
 # Or start a specific app
 pnpm --filter web dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ### Other Commands
 
@@ -59,14 +87,56 @@ pnpm lint
 pnpm start
 ```
 
+### 🐳 Docker Commands
+
+```bash
+# Start all services
+docker-compose up
+
+# Start in background
+docker-compose up -d
+
+# Stop all services
+docker-compose down
+
+# Rebuild and start
+docker-compose up --build
+
+# View logs
+docker-compose logs
+
+# View logs for specific service
+docker-compose logs api
+docker-compose logs web
+docker-compose logs postgres
+
+# Execute commands in running container
+docker-compose exec api bash
+docker-compose exec web sh
+
+# Remove all containers and volumes
+docker-compose down -v
+```
+
 ## 🛠️ Tech Stack
 
+### Frontend
 - **Framework**: Next.js 16 (with Turbopack)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **UI Components**: shadcn/ui + Radix UI
+
+### Backend
+- **Framework**: FastAPI
+- **Language**: Python 3.11
+- **Database**: PostgreSQL 15
+- **ORM**: SQLAlchemy 2.0
+- **Migration**: Alembic
+
+### Development
 - **Package Manager**: pnpm
 - **Monorepo**: pnpm workspaces
+- **Containerization**: Docker & Docker Compose
 
 ## 📁 Project Structure
 

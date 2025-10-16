@@ -1,0 +1,67 @@
+# ========================================
+# Production Docker Compose
+# 本番環境用設定
+# ========================================
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: mokabu-lens-postgres-prod
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-mokabu_lens}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+      - ./apps/api/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mokabu-lens-network-prod
+    restart: unless-stopped
+
+  # FastAPI Backend
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: mokabu-lens-api-prod
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-mokabu_lens}
+      - PYTHONPATH=/app
+      - NODE_ENV=${NODE_ENV:-production}
+      - PYTHON_ENV=${PYTHON_ENV:-production}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      - postgres
+    networks:
+      - mokabu-lens-network-prod
+    restart: unless-stopped
+
+  # Next.js Frontend (Production)
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      target: production  # 本番環境用
+    container_name: mokabu-lens-web-prod
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      - NODE_ENV=${NODE_ENV:-production}
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    depends_on:
+      - api
+    networks:
+      - mokabu-lens-network-prod
+    restart: unless-stopped
+
+volumes:
+  postgres_data_prod:
+
+networks:
+  mokabu-lens-network-prod:
+    driver: bridge

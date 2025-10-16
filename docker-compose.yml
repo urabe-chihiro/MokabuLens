@@ -1,0 +1,66 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: mokabu-lens-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-mokabu_lens}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./apps/api/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mokabu-lens-network
+
+  # FastAPI Backend
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+      target: development
+    container_name: mokabu-lens-api
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-mokabu_lens}
+      - PYTHONPATH=/app
+      - PYTHON_ENV=${PYTHON_ENV:-development}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ./apps/api:/app
+    depends_on:
+      - postgres
+    networks:
+      - mokabu-lens-network
+    command: uvicorn main:app --host ${API_HOST:-0.0.0.0} --port 8000 --reload
+
+  # Next.js Frontend
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      target: development  # 開発環境用
+    container_name: mokabu-lens-web
+    environment:
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      - NODE_ENV=${NODE_ENV:-development}
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules  # node_modulesは除外
+      - /app/.next         # .nextは除外
+    depends_on:
+      - api
+    networks:
+      - mokabu-lens-network
+
+volumes:
+  postgres_data:
+
+networks:
+  mokabu-lens-network:
+    driver: bridge
