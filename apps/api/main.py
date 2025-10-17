@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from config import settings
+from routers import stock
 
 # 環境変数を読み込み
 load_dotenv()
@@ -26,6 +27,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ルーターを追加
+app.include_router(stock.router, prefix="/api/v1")
 
 @app.get("/")
 async def root():

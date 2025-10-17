@@ -4,6 +4,6 @@ Models package for MokabuLens API
 """
 
 from .user import User
-from .product import Product
+from .stock import StockInfo, StockPrice
 
-__all__ = ["User", "Product"]
+__all__ = ["User", "StockInfo", "StockPrice"]

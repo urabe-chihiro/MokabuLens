@@ -3,7 +3,7 @@
 モダンな設定管理パターンを実装
 """
 from functools import lru_cache
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, ConfigDict
 from pydantic_settings import BaseSettings
 
 
@@ -20,9 +20,7 @@ class DatabaseConfig(BaseSettings):
         """データベースURLを生成"""
         return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
     
-    class Config:
-        env_prefix = "POSTGRES_"
-        case_sensitive = False
+    model_config = ConfigDict(env_prefix="POSTGRES_", case_sensitive=False)
 
 
 class APIConfig(BaseSettings):
@@ -46,9 +44,7 @@ class APIConfig(BaseSettings):
             return origins
         return v
     
-    class Config:
-        env_prefix = "API_"
-        case_sensitive = False
+    model_config = ConfigDict(env_prefix="API_", case_sensitive=False)
 
 
 class SecurityConfig(BaseSettings):
@@ -58,9 +54,7 @@ class SecurityConfig(BaseSettings):
     jwt_expire_minutes: int = Field(default=30, description="JWT有効期限（分）")
     encryption_key: str = Field(default="dev_encryption_key", description="暗号化キー")
     
-    class Config:
-        env_prefix = "SECURITY_"
-        case_sensitive = False
+    model_config = ConfigDict(env_prefix="SECURITY_", case_sensitive=False)
 
 
 class LoggingConfig(BaseSettings):
@@ -80,9 +74,7 @@ class LoggingConfig(BaseSettings):
             raise ValueError(f"Invalid log level: {v}. Must be one of {valid_levels}")
         return v.upper()
     
-    class Config:
-        env_prefix = "LOG_"
-        case_sensitive = False
+    model_config = ConfigDict(env_prefix="LOG_", case_sensitive=False)
 
 
 class AppConfig(BaseSettings):
@@ -115,10 +107,7 @@ class AppConfig(BaseSettings):
         """本番環境かどうか"""
         return self.environment == "production"
     
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = False
+    model_config = ConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False)
 
 
 @lru_cache()
