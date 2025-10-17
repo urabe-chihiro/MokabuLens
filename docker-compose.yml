@@ -26,6 +26,9 @@ services:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@${POSTGRES_HOST:-postgres}:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-mokabu_lens}
       - PYTHONPATH=/app
       - PYTHON_ENV=${PYTHON_ENV:-development}
+      - CORS_ORIGINS=${API_CORS_ORIGINS:-http://localhost:3000,http://localhost:3001}
+      - SECURITY_JWT_SECRET=${SECURITY_JWT_SECRET:-dev_jwt_secret}
+      - SECURITY_ENCRYPTION_KEY=${SECURITY_ENCRYPTION_KEY:-dev_encryption_key}
     ports:
       - "${API_PORT:-8000}:8000"
     volumes:

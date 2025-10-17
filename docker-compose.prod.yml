@@ -32,6 +32,9 @@ services:
       - PYTHONPATH=/app
       - NODE_ENV=${NODE_ENV:-production}
       - PYTHON_ENV=${PYTHON_ENV:-production}
+      - CORS_ORIGINS=${API_CORS_ORIGINS:-https://yourdomain.com}
+      - SECURITY_JWT_SECRET=${SECURITY_JWT_SECRET}
+      - SECURITY_ENCRYPTION_KEY=${SECURITY_ENCRYPTION_KEY}
     ports:
       - "${API_PORT:-8000}:8000"
     depends_on:

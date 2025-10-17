@@ -1,10 +1,14 @@
+"""
+データベース接続設定
+モダンな設定管理パターンを使用
+"""
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os
+from config import settings
 
-# データベースURLを取得
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@postgres:5432/mokabu_lens")
+# 設定からデータベースURLを取得
+DATABASE_URL = settings.database.url
 
 # SQLAlchemyエンジンを作成
 engine = create_engine(DATABASE_URL)

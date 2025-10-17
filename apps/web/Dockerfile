@@ -20,8 +20,8 @@ WORKDIR /app
 # ========================================
 FROM base AS deps
 
-# package.jsonとpnpm-lock.yamlをコピー
-COPY package.json pnpm-lock.yaml ./
+# package.jsonをコピー
+COPY package.json ./
 
 # 依存関係をインストール（本番用）
 RUN pnpm install --no-frozen-lockfile --prod
@@ -32,7 +32,7 @@ RUN pnpm install --no-frozen-lockfile --prod
 FROM base AS development
 
 # 開発用の依存関係をインストール
-COPY package.json pnpm-lock.yaml ./
+COPY package.json ./
 RUN pnpm install --no-frozen-lockfile
 
 # ソースコードをコピー
@@ -50,7 +50,7 @@ CMD ["pnpm", "dev"]
 FROM base AS builder
 
 # 開発用の依存関係をインストール
-COPY package.json pnpm-lock.yaml ./
+COPY package.json ./
 RUN pnpm install --no-frozen-lockfile
 
 # ソースコードをコピー
