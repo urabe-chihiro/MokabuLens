@@ -29,7 +29,7 @@ app.add_middleware(
 )
 
 # ルーターを追加
-app.include_router(stock.router, prefix="/api/v1")
+app.include_router(stock.router, prefix=f"/api/{settings.api.version}")
 
 @app.get("/")
 async def root():

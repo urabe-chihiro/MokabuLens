@@ -38,8 +38,37 @@ pip install -r requirements.txt
 
 ### 2. データベースマイグレーション
 
+#### 初回セットアップ
+
 ```bash
+# マイグレーションファイルの生成
 alembic revision --autogenerate -m "Create stock tables"
+
+# マイグレーションの実行
+alembic upgrade head
+```
+
+#### Docker環境でのマイグレーション
+
+```bash
+# Dockerコンテナ内でマイグレーション実行
+docker-compose exec api bash -c "cd /app && alembic revision --autogenerate -m 'Description'"
+docker-compose exec api bash -c "cd /app && alembic upgrade head"
+```
+
+#### マイグレーション管理
+
+```bash
+# 現在のマイグレーション状態を確認
+alembic current
+
+# マイグレーション履歴を表示
+alembic history
+
+# 特定のリビジョンに戻す
+alembic downgrade <revision_id>
+
+# 最新のマイグレーションに更新
 alembic upgrade head
 ```
 
@@ -112,6 +141,25 @@ python -m pytest test/ --cov=. --cov-report=html
 
 詳細なテストガイドは [test/README.md](test/README.md) を参照してください。
 
+## データベーススキーマ
+
+### テーブル構成
+
+| テーブル名 | 説明 | 主要カラム |
+|-----------|------|-----------|
+| `stock_info` | 株式基本情報 | `symbol`, `company_name`, `market`, `sector` |
+| `stock_prices` | 株価データ | `symbol`, `date`, `open_price`, `close_price`, `volume` |
+| `users` | ユーザー情報 | `username`, `email`, `created_at` |
+| `alembic_version` | マイグレーション管理 | `version_num` |
+
+### インデックス
+
+- `ix_stock_info_symbol`: 証券コード（ユニーク）
+- `ix_stock_prices_symbol`: 証券コード
+- `ix_stock_prices_date`: 日付
+- `ix_users_username`: ユーザー名（ユニーク）
+- `ix_users_email`: メールアドレス（ユニーク）
+
 ## 技術スタック
 
 - **FastAPI**: Webフレームワーク
@@ -146,6 +194,7 @@ POSTGRES_PASSWORD=postgres
 API_HOST=0.0.0.0
 API_PORT=8000
 API_DEBUG=true
+API_VERSION=v1
 ```
 
 ## Docker環境
@@ -176,6 +225,45 @@ docker-compose -f docker-compose.prod.yml up
 3. 変更をコミット (`git commit -m 'Add some amazing feature'`)
 4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
 5. プルリクエストを作成
+
+## トラブルシューティング
+
+### マイグレーション関連
+
+#### データベース接続エラー
+```bash
+# エラー: could not translate host name "postgres" to address
+# 解決策: Dockerコンテナ内でマイグレーション実行
+docker-compose exec api bash -c "cd /app && alembic upgrade head"
+```
+
+#### マイグレーション状態の確認
+```bash
+# 現在の状態を確認
+docker-compose exec api bash -c "cd /app && alembic current"
+
+# データベースのテーブル一覧を確認
+docker-compose exec postgres psql -U postgres -d mokabu_lens -c "\dt"
+```
+
+#### マイグレーションのリセット
+```bash
+# 注意: 本番環境では実行しないでください
+docker-compose exec postgres psql -U postgres -d mokabu_lens -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+docker-compose exec api bash -c "cd /app && alembic upgrade head"
+```
+
+### テスト関連
+
+#### テストが失敗する場合
+```bash
+# 依存関係を再インストール
+pip install -r requirements.txt
+
+# テスト用データベースをリセット
+rm -f test.db
+python -m pytest test/ -v
+```
 
 ## サポート
 

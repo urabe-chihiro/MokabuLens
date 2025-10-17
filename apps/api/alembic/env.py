@@ -22,7 +22,6 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from database import Base
 from models.stock import StockInfo, StockPrice
-from models.user import User
 
 target_metadata = Base.metadata
 
@@ -63,8 +62,10 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    # Use direct PostgreSQL connection for migration
+    url = "postgresql://postgres:postgres@postgres:5432/mokabu_lens"
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        {"sqlalchemy.url": url},
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

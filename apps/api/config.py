@@ -28,6 +28,7 @@ class APIConfig(BaseSettings):
     host: str = Field(default="0.0.0.0", description="APIサーバーホスト")
     port: int = Field(default=8000, description="APIサーバーポート")
     debug: bool = Field(default=False, description="デバッグモード")
+    version: str = Field(default="v1", description="APIバージョン")
     cors_origins: list[str] = Field(
         default=["http://localhost:3000", "http://localhost:3001"], 
         description="CORS許可オリジン"
