@@ -4,6 +4,15 @@ See the market through your own lens.
 
 Built with **Next.js**, **FastAPI**, **PostgreSQL**, and **SQLAlchemy**, MokabuLens is a friendly dashboard for investors to record insights, monitor stock indicators, and grow smarter — the Mokabu way.
 
+## ✨ Features
+
+- **🔐 Google OAuth Authentication** - Secure login with Google accounts
+- **📱 Responsive Dashboard** - Modern UI built with Next.js and shadcn/ui
+- **🏗️ BFF Architecture** - Backend for Frontend pattern for optimized API layer
+- **🏗️ Monorepo Architecture** - Organized with pnpm workspaces
+- **🐳 Docker Ready** - Easy development and deployment setup
+- **📊 FastAPI Backend** - High-performance API with automatic documentation
+
 ## 🏗️ Monorepo Structure
 
 This project uses a monorepo structure with pnpm workspaces:
@@ -12,19 +21,35 @@ This project uses a monorepo structure with pnpm workspaces:
 MokabuLens/
 ├── apps/
 │   ├── web/                    # Next.js web application
-│   │   ├── app/               # App Router pages and components
-│   │   ├── components/        # Reusable UI components (shadcn/ui)
+│   │   ├── app/               # Next.js App Router
+│   │   │   ├── (auth)/        # Authentication route group
+│   │   │   │   └── signin/    # Google OAuth sign-in
+│   │   │   ├── (dashboard)/   # Dashboard route group
+│   │   │   │   └── page.tsx   # Main dashboard
+│   │   │   ├── api/           # Next.js API Routes
+│   │   │   │   └── auth/      # Authentication endpoints
+│   │   │   └── components/    # UI components (shadcn/ui)
+│   │   ├── services/          # BFF business logic layer
+│   │   │   └── auth.service.ts
+│   │   ├── types/             # TypeScript type definitions
+│   │   │   ├── auth.types.ts
+│   │   │   └── api.types.ts
 │   │   └── Dockerfile         # Docker configuration for web app
 │   └── api/                   # FastAPI backend application
 │       ├── main.py            # FastAPI main application
 │       ├── database.py        # SQLAlchemy database configuration
-│       ├── models.py          # Database models
+│       ├── models/            # Database models
+│       │   ├── user.py        # User model
+│       │   └── product.py     # Product model
 │       ├── requirements.txt   # Python dependencies
 │       ├── Dockerfile         # Docker configuration for API
 │       └── init.sql           # PostgreSQL initialization script
 ├── docker-compose.yml         # Docker Compose configuration
-├── package.json               # Root workspace configuration
-└── pnpm-workspace.yaml       # pnpm workspace configuration
+├── docker-compose.dev.yml     # Development environment
+├── docker-compose.prod.yml    # Production environment
+├── env.example               # Environment variables template
+├── package.json              # Root workspace configuration
+└── pnpm-workspace.yaml      # pnpm workspace configuration
 ```
 
 ## 🚀 Getting Started
@@ -34,6 +59,41 @@ MokabuLens/
 - Docker and Docker Compose
 - Node.js 18+ (for local development)
 - pnpm (recommended package manager)
+- Google Cloud Console account (for OAuth setup)
+
+### 🔐 Google OAuth Setup
+
+Before running the application, you need to set up Google OAuth:
+
+1. **Create a Google Cloud Project**:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select an existing one
+
+2. **Enable Google+ API**:
+   - Navigate to "APIs & Services" > "Library"
+   - Search for "Google+ API" and enable it
+
+3. **Create OAuth 2.0 Credentials**:
+   - Go to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "OAuth 2.0 Client ID"
+   - Choose "Web application"
+   - Add authorized redirect URIs:
+     - `http://localhost:3000/api/auth/callback/google` (development)
+     - `https://yourdomain.com/api/auth/callback/google` (production)
+
+4. **Configure Environment Variables**:
+   ```bash
+   # Copy the example environment file
+   cp env.example .env.local
+   
+   # Edit .env.local and add your Google OAuth credentials
+   GOOGLE_CLIENT_ID=your_google_client_id_here
+   GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+   NEXTAUTH_URL=http://localhost:3000
+   NEXTAUTH_SECRET=your_nextauth_secret_key_here
+   ```
+
+For detailed setup instructions, see [GOOGLE_OAUTH_SETUP.md](./GOOGLE_OAUTH_SETUP.md).
 
 ### 🐳 Docker Development (Recommended)
 
@@ -50,11 +110,12 @@ docker-compose up -d
 This will start:
 - **PostgreSQL** on `localhost:5432`
 - **FastAPI API** on `http://localhost:8000`
-- **Next.js Web App** on `http://localhost:3000`
+- **Next.js Web App** on `http://localhost:3001` (port 3000 might be in use)
 
 ### 📱 Access the Applications
 
-- **Frontend (Next.js)**: [http://localhost:3000](http://localhost:3000)
+- **Frontend (Next.js)**: [http://localhost:3001](http://localhost:3001) or [http://localhost:3000](http://localhost:3000)
+- **Sign In Page**: [http://localhost:3001/signin](http://localhost:3001/signin)
 - **Backend API (FastAPI)**: [http://localhost:8000](http://localhost:8000)
 - **API Documentation**: [http://localhost:8000/docs](http://localhost:8000/docs)
 - **Database**: PostgreSQL on `localhost:5432`
@@ -121,10 +182,13 @@ docker-compose down -v
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **Framework**: Next.js 16 (with Turbopack)
+- **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **UI Components**: shadcn/ui + Radix UI
+- **Authentication**: NextAuth.js with Google OAuth
+- **State Management**: React hooks + Context API
+- **BFF Pattern**: Next.js API Routes as Backend for Frontend layer
 
 ### Backend
 - **Framework**: FastAPI
@@ -138,16 +202,72 @@ docker-compose down -v
 - **Monorepo**: pnpm workspaces
 - **Containerization**: Docker & Docker Compose
 
-## 📁 Project Structure
+## 📁 Project Architecture
 
-- **`apps/web/`** - Main Next.js web application
-  - UI components are managed within the web app
-  - Uses App Router for routing
-  - Configured with shadcn/ui components
+### Next.js App Router Structure
 
-- **`packages/`** - Shared packages (ready for future expansion)
-  - Can be used for shared utilities, types, or components
-  - Currently empty, ready for additional apps/services
+The web application follows Next.js App Router conventions with route groups for better organization:
+
+- **`(auth)/`** - Authentication route group
+  - `/signin` - Google OAuth sign-in page
+  - Dedicated layout for authentication flows
+
+- **`(dashboard)/`** - Dashboard route group
+  - `/` - Main dashboard page
+  - Dedicated layout with navigation and user controls
+
+- **`api/`** - Next.js API Routes
+  - `/api/auth/[...nextauth]` - NextAuth.js authentication endpoints
+  - BFF (Backend for Frontend) pattern implementation
+
+### BFF (Backend for Frontend) Architecture
+
+This application implements the **BFF pattern** to provide a dedicated backend layer specifically optimized for the frontend needs:
+
+- **`app/api/`** - Next.js API Routes (BFF Layer)
+  - `/api/auth/[...nextauth]` - Authentication endpoints
+  - Acts as a proxy between frontend and external services
+  - Handles authentication, data transformation, and business logic
+
+- **`services/`** - Business logic layer
+  - `auth.service.ts` - Authentication service with NextAuth.js integration
+  - Encapsulates complex business logic and API interactions
+  - Provides clean interfaces for UI components
+
+- **`types/`** - TypeScript type definitions
+  - `auth.types.ts` - Authentication-related types
+  - `api.types.ts` - API response and request types
+  - Ensures type safety across the BFF layer
+
+- **`components/`** - Reusable UI components
+  - `ui/` - shadcn/ui base components
+  - `layout/` - Layout-specific components
+
+#### BFF Benefits
+
+- **Frontend Optimization**: API responses tailored specifically for UI needs
+- **Security**: Sensitive operations handled server-side
+- **Performance**: Reduced client-side processing and network calls
+- **Maintainability**: Clear separation between UI and business logic
+- **Scalability**: Independent scaling of frontend and backend concerns
+
+## 🔐 Authentication Flow
+
+The application implements a secure authentication system using NextAuth.js with Google OAuth:
+
+1. **User visits `/signin`** - Redirected to Google OAuth
+2. **Google authentication** - User authorizes the application
+3. **Callback handling** - NextAuth.js processes the OAuth response
+4. **Session creation** - User session is established
+5. **Dashboard access** - Authenticated user can access the main dashboard
+6. **Session management** - Automatic session refresh and logout functionality
+
+### Security Features
+
+- **JWT-based sessions** - Secure session management
+- **CSRF protection** - Built-in CSRF protection via NextAuth.js
+- **Secure cookies** - HttpOnly cookies for session storage
+- **Environment-based configuration** - Secure credential management
 
 ## 🔧 Development
 
