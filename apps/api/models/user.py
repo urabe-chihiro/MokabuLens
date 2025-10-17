@@ -1,8 +1,14 @@
+"""
+User model for MokabuLens API
+ユーザーモデルの定義
+"""
 from sqlalchemy import Column, Integer, String, DateTime, Text
 from sqlalchemy.sql import func
 from database import Base
 
+
 class User(Base):
+    """ユーザーモデル"""
     __tablename__ = "users"
     
     id = Column(Integer, primary_key=True, index=True)
