@@ -20,36 +20,37 @@ This project uses a monorepo structure with pnpm workspaces:
 ```
 MokabuLens/
 ├── apps/
-│   ├── web/                    # Next.js web application
-│   │   ├── app/               # Next.js App Router
-│   │   │   ├── (auth)/        # Authentication route group
-│   │   │   │   └── signin/    # Google OAuth sign-in
-│   │   │   ├── (dashboard)/   # Dashboard route group
-│   │   │   │   └── page.tsx   # Main dashboard
-│   │   │   ├── api/           # Next.js API Routes
-│   │   │   │   └── auth/      # Authentication endpoints
-│   │   │   └── components/    # UI components (shadcn/ui)
-│   │   ├── services/          # BFF business logic layer
-│   │   │   └── auth.service.ts
-│   │   ├── types/             # TypeScript type definitions
-│   │   │   ├── auth.types.ts
-│   │   │   └── api.types.ts
-│   │   └── Dockerfile         # Docker configuration for web app
-│   └── api/                   # FastAPI backend application
-│       ├── main.py            # FastAPI main application
-│       ├── database.py        # SQLAlchemy database configuration
-│       ├── models/            # Database models
-│       │   ├── user.py        # User model
-│       │   └── product.py     # Product model
-│       ├── requirements.txt   # Python dependencies
-│       ├── Dockerfile         # Docker configuration for API
-│       └── init.sql           # PostgreSQL initialization script
-├── docker-compose.yml         # Docker Compose configuration
-├── docker-compose.dev.yml     # Development environment
-├── docker-compose.prod.yml    # Production environment
-├── env.example               # Environment variables template
-├── package.json              # Root workspace configuration
-└── pnpm-workspace.yaml      # pnpm workspace configuration
+│   ├── web/                          # Next.js Frontend Application
+│   │   ├── app/                     # Next.js App Router
+│   │   │   ├── (route-group)/       # Route Groups (URL影響しない)
+│   │   │   │   ├── page-name/       # 各ページディレクトリ
+│   │   │   │   │   ├── page.tsx     # ページコンポーネント
+│   │   │   │   │   ├── layout.tsx   # レイアウトコンポーネント
+│   │   │   │   │   └── components/  # Feature-based colocation (Next.js pattern)
+│   │   │   │   │       ├── *.tsx    # Server Components
+│   │   │   │   │       └── ui/      # Client Components
+│   │   │   │   │           └── *.tsx
+│   │   │   │   └── layout.tsx       # Route Group レイアウト
+│   │   │   ├── api/                 # BFF API Routes
+│   │   │   │   └── [...route]/      # BFFエンドポイント
+│   │   │   │       └── route.ts     # FastAPI連携 + データ変換
+│   │   │   ├── components/          # グローバルコンポーネント
+│   │   │   │   ├── ui/             # 基本UIコンポーネント
+│   │   │   │   └── layout/         # レイアウトコンポーネント
+│   │   │   ├── globals.css         # グローバルCSS
+│   │   │   └── layout.tsx          # ルートレイアウト
+│   │   ├── services/               # クライアント用API呼び出し
+│   │   ├── types/                  # TypeScript型定義
+│   │   └── lib/                    # ユーティリティ関数
+│   └── api/                        # FastAPI Backend Application
+│       ├── main.py                 # FastAPI アプリケーション
+│       ├── database.py             # データベース設定
+│       ├── models/                 # SQLAlchemy モデル
+│       ├── routers/                # API ルーター
+│       ├── services/               # ビジネスロジック
+│       └── requirements.txt        # Python依存関係
+├── docker-compose.yml              # Docker構成
+└── package.json                    # ワークスペース設定
 ```
 
 ## 🚀 Getting Started
@@ -66,14 +67,17 @@ MokabuLens/
 Before running the application, you need to set up Google OAuth:
 
 1. **Create a Google Cloud Project**:
+
    - Go to [Google Cloud Console](https://console.cloud.google.com/)
    - Create a new project or select an existing one
 
 2. **Enable Google+ API**:
+
    - Navigate to "APIs & Services" > "Library"
    - Search for "Google+ API" and enable it
 
 3. **Create OAuth 2.0 Credentials**:
+
    - Go to "APIs & Services" > "Credentials"
    - Click "Create Credentials" > "OAuth 2.0 Client ID"
    - Choose "Web application"
@@ -82,10 +86,11 @@ Before running the application, you need to set up Google OAuth:
      - `https://yourdomain.com/api/auth/callback/google` (production)
 
 4. **Configure Environment Variables**:
+
    ```bash
    # Copy the example environment file
    cp env.example .env.local
-   
+
    # Edit .env.local and add your Google OAuth credentials
    GOOGLE_CLIENT_ID=your_google_client_id_here
    GOOGLE_CLIENT_SECRET=your_google_client_secret_here
@@ -108,6 +113,7 @@ docker-compose up -d
 ```
 
 This will start:
+
 - **PostgreSQL** on `localhost:5432`
 - **FastAPI API** on `http://localhost:8000`
 - **Next.js Web App** on `http://localhost:3001` (port 3000 might be in use)
@@ -182,6 +188,7 @@ docker-compose down -v
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
@@ -191,6 +198,7 @@ docker-compose down -v
 - **BFF Pattern**: Next.js API Routes as Backend for Frontend layer
 
 ### Backend
+
 - **Framework**: FastAPI
 - **Language**: Python 3.11
 - **Database**: PostgreSQL 15
@@ -198,6 +206,7 @@ docker-compose down -v
 - **Migration**: Alembic
 
 ### Development
+
 - **Package Manager**: pnpm
 - **Monorepo**: pnpm workspaces
 - **Containerization**: Docker & Docker Compose
@@ -206,35 +215,94 @@ docker-compose down -v
 
 ### Next.js App Router Structure
 
-The web application follows Next.js App Router conventions with route groups for better organization:
+The frontend follows Next.js App Router conventions with a clear component organization pattern, implementing the [Split project files by feature or route strategy](https://nextjs.org/docs/app/getting-started/project-structure#split-project-files-by-feature-or-route).
 
-- **`(auth)/`** - Authentication route group
-  - `/signin` - Google OAuth sign-in page
-  - Dedicated layout for authentication flows
+#### Directory Structure Pattern
 
-- **`(dashboard)/`** - Dashboard route group
-  - `/` - Main dashboard page
-  - Dedicated layout with navigation and user controls
+```
+app/
+├── (route-group)/              # Route Groups - URLに影響しない組織化
+│   ├── page-name/             # ページディレクトリ
+│   │   ├── page.tsx          # メインページコンポーネント
+│   │   ├── layout.tsx        # ページ専用レイアウト
+│   │   └── components/       # ページ固有コンポーネント (Feature-based colocation - see Next.js docs)
+│   │       ├── Component.tsx # Server Component
+│   │       └── ui/          # Client Components
+│   │           └── Button.tsx
+│   └── layout.tsx            # Route Group レイアウト
+├── api/                      # API Routes
+│   └── [...route]/           # Dynamic Routes
+│       └── route.ts         # API Handler
+└── components/              # グローバルコンポーネント
+```
 
-- **`api/`** - Next.js API Routes
-  - `/api/auth/[...nextauth]` - NextAuth.js authentication endpoints
-  - BFF (Backend for Frontend) pattern implementation
+#### Component Organization Rules
+
+**Route-specific Components** (`app/(route-group)/page-name/components/`)
+
+This project follows the [Next.js "Split project files by feature or route" pattern](https://nextjs.org/docs/app/getting-started/project-structure#split-project-files-by-feature-or-route), which means:
+
+- Components specific to a particular route/feature are **colocated** within the route segment
+- Globally shared application code is stored in the root `app` directory
+- More specific application code is **split** into the route segments that use them
+- Improves maintainability by keeping related code together and reducing coupling
+
+> **Reference**: This approach is officially recommended in the [Next.js documentation](https://nextjs.org/docs/app/getting-started/project-structure#split-project-files-by-feature-or-route) as one of the common project organization strategies.
+
+**Component Types:**
+
+- **`components/`** → **Server Components** (デフォルト)
+
+  - サーバーサイドレンダリング
+  - データフェッチ
+  - 静的コンテンツ
+
+- **`components/ui/`** → **Client Components** (`"use client"`)
+  - インタラクティブ機能
+  - React hooks 使用
+  - ブラウザ API 使用
 
 ### BFF (Backend for Frontend) Architecture
 
-This application implements the **BFF pattern** to provide a dedicated backend layer specifically optimized for the frontend needs:
+This application implements the **BFF pattern** with a clear separation between API layers:
 
-- **`app/api/`** - Next.js API Routes (BFF Layer)
-  - `/api/auth/[...nextauth]` - Authentication endpoints
-  - Acts as a proxy between frontend and external services
-  - Handles authentication, data transformation, and business logic
+#### Server-Side BFF Layer (`app/api/[...route]/route.ts`)
 
-- **`services/`** - Business logic layer
-  - `auth.service.ts` - Authentication service with NextAuth.js integration
-  - Encapsulates complex business logic and API interactions
-  - Provides clean interfaces for UI components
+- **Purpose**: Next.js API Routes that act as BFF endpoints
+- **Responsibilities**:
+  - Fetch data from `apps/api` (FastAPI backend)
+  - Data transformation and aggregation
+  - Authentication and authorization
+  - Frontend-optimized response formatting
+
+```typescript
+// Example: app/api/stocks/route.ts
+export async function GET(request: Request) {
+  // 1. 認証チェック
+  // 2. FastAPI (apps/api) からデータ取得
+  // 3. データ変換・集約
+  // 4. フロントエンド最適化されたレスポンス
+}
+```
+
+#### Client-Side Service Layer (`services/`)
+
+- **Purpose**: Client-side services that call BFF endpoints
+- **Responsibilities**:
+  - Call Next.js API Routes (`app/api/`)
+  - Client-side state management
+  - UI component integration
+
+```typescript
+// Example: services/stock.service.ts
+export async function getStockData() {
+  const response = await fetch('/api/stocks'); // BFF endpoint
+  return response.json();
+}
+```
 
 - **`types/`** - TypeScript type definitions
+
   - `auth.types.ts` - Authentication-related types
   - `api.types.ts` - API response and request types
   - Ensures type safety across the BFF layer
@@ -331,12 +399,14 @@ If you need to configure manually in Vercel dashboard:
 If you encounter path duplication errors (like `/vercel/path0/apps/web/apps/web/.next/`):
 
 **Method 1: Fix existing project**
+
 1. Go to your Vercel project settings
 2. Set **Root Directory** to `apps/web`
 3. Set **Output Directory** to `.next`
 4. Redeploy the project
 
 **Method 2: Create new project (recommended)**
+
 1. **Delete the existing Vercel project**
 2. **Create a new project** from the same repository
 3. **During project creation, set Root Directory to `apps/web`**

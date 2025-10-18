@@ -1,6 +1,6 @@
-import NextAuth from "next-auth"
-import GoogleProvider from "next-auth/providers/google"
-import { NextAuthOptions } from "next-auth"
+import NextAuth from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
+import { NextAuthOptions } from 'next-auth';
 
 const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-development',
@@ -12,20 +12,20 @@ const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async session({ session }) {
-      return session
+      return session;
     },
     async jwt({ token }) {
-      return token
+      return token;
     },
   },
   pages: {
     signIn: '/signin',
   },
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
-}
+};
 
-const handler = NextAuth(authOptions)
+const handler = NextAuth(authOptions);
 
-export { handler as GET, handler as POST }
+export { handler as GET, handler as POST };

@@ -1,5 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export default function Dashboard() {
   return (
@@ -7,7 +13,7 @@ export default function Dashboard() {
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold">🐾 Mokabu Lens</h1>
         <p className="text-muted-foreground">
-        See the market through your own lens.
+          See the market through your own lens.
         </p>
       </div>
 

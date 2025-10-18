@@ -1,10 +1,10 @@
-import type { NextConfig } from "next";
-import path from "path";
+import type { NextConfig } from 'next';
+import path from 'path';
 
 const nextConfig: NextConfig = {
   // Docker用のstandalone出力を有効化
   output: 'standalone',
-  
+
   // 画像ドメインの設定
   images: {
     remotePatterns: [
@@ -16,19 +16,19 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  
+
   // パスエイリアスの設定
-  webpack: (config) => {
+  webpack: config => {
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, './'),
     };
     return config;
   },
-  
+
   // 本番環境での最適化
   compress: true,
-  
+
   // セキュリティヘッダー
   async headers() {
     return [
